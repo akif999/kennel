@@ -35,13 +35,22 @@ mainloop:
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
-			termbox.SetCell(c.x, c.y, ev.Ch, termbox.ColorBlue, termbox.ColorWhite)
-			c.x++
 			switch ev.Key {
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
 				FeedNewline(c)
+			case termbox.KeyBackspace:
+				BackSpace(c)
+			case termbox.KeyDelete:
+				BackSpace(c)
+			case termbox.KeyCtrlB:
+				BackSpace(c)
+			default:
+				if ev.Ch != 0 {
+					termbox.SetCell(c.x, c.y, ev.Ch, termbox.ColorBlue, termbox.ColorWhite)
+					c.x++
+				}
 			}
 			termbox.SetCursor(c.x, c.y)
 			DisplayPositon(c)
@@ -56,7 +65,10 @@ func FeedNewline(c *Cursor) {
 }
 
 func BackSpace(c *Cursor) {
-	termbox.SetCell(c.x, c.y, []rune(" ")[0], termbox.ColorBlue, termbox.ColorWhite)
+	if c.x > 2 {
+		c.x -= 1
+		termbox.SetCell(c.x, c.y, []rune(" ")[0], termbox.ColorBlue, termbox.ColorWhite)
+	}
 }
 
 func DeleteCell(x, y int) {
@@ -76,3 +88,6 @@ func DisplayPositon(c *Cursor) {
 		termbox.SetCell(i+5, 30, y, termbox.ColorBlue, termbox.ColorWhite)
 	}
 }
+
+// func InitBuffer() {
+// }
