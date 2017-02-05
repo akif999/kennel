@@ -59,6 +59,8 @@ mainloop:
 			}
 			termbox.SetCursor(c.x, c.y)
 			DisplayPositon(c)
+		case termbox.EventError:
+			log.Fatal(ev.Err)
 		}
 		termbox.Flush()
 	}
