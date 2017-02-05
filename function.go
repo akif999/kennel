@@ -7,6 +7,11 @@ import (
 	"strconv"
 )
 
+func WriteTextToBuf(ch rune, c Cursor) {
+	termbox.SetCell(c.x, c.y, ch, termbox.ColorBlue, termbox.ColorWhite)
+	c.x++
+}
+
 func FeedNewline(c *Cursor) {
 	if c.y < TEXTBUFROWMAX {
 		c.x = TEXTBUFCOLMIN
