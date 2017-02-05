@@ -22,13 +22,13 @@ func FeedNewline(c *Cursor) {
 func BackSpace(c *Cursor) {
 	if c.x > TEXTBUFCOLMIN {
 		c.x -= 1
-		termbox.SetCell(c.x, c.y, []rune(" ")[0], termbox.ColorBlue, termbox.ColorWhite)
+		termbox.SetCell(c.x, c.y, ' ', termbox.ColorBlue, termbox.ColorWhite)
 	} else {
 	}
 }
 
 func DeleteChar(x, y int) {
-	termbox.SetCell(x, y, []rune(" ")[0], termbox.ColorBlue, termbox.ColorWhite)
+	termbox.SetCell(x, y, ' ', termbox.ColorBlue, termbox.ColorWhite)
 }
 
 func DisplayPositon(c *Cursor) {
