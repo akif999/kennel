@@ -1,28 +1,29 @@
 package main
 
 import (
+	"./buffer"
 	"github.com/nsf/termbox-go"
 	"log"
 )
 
-const (
-	COLOFFSET     = 2
-	ROWOFFSET     = 1
-	TEXTBUFROWMAX = 28
-	TEXTBUFCOLMAX = 88
-	TEXTBUFCOLMIN = 2
-	TITLE         = "KENNEL"
-)
+const ()
 
-type Cursor struct {
-	x int
-	y int
+type CurPos struct {
+	x uint
+	y uint
 }
 
+type WrtPos struct {
+	x uint
+	y uint
+}
+
+// TODO
+// goroutinr前提の設計とする
+// まずはbufferパッケージの機能から実装してリライトする
+// 改行コードで改行する処理を実装する(CopyScrnBufToTermBoxBufの中でやる)
+
 func main() {
-	c := new(Cursor)
-	c.x = COLOFFSET
-	c.y = ROWOFFSET
 
 	err := termbox.Init()
 	if err != nil {
@@ -31,11 +32,13 @@ func main() {
 	defer termbox.Close()
 
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
-	InitBuffer()
-	DisplayPositon(c)
-	termbox.SetCursor(c.x, c.y)
+
+	termbox.SetCursor(0, 0)
 	termbox.Flush()
 
+	sb := buffer.NewScenBuffer()
+
+	var x uint
 mainloop:
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
@@ -44,24 +47,30 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
-				FeedNewline(c)
+				sb.AddNewLine(WrtPos.x)
+				WrtPos.x++
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				BackSpace(c)
 			case termbox.KeyCtrlS:
-				SaveBufToFile("hoge.txt", termbox.CellBuffer())
 			default:
 				if ev.Ch != 0 {
-					if c.x < TEXTBUFCOLMAX {
-						termbox.SetCell(c.x, c.y, ev.Ch, termbox.ColorBlue, termbox.ColorWhite)
-						c.x++
-					}
+					sb.WriteChrToSBuf(WrtPos.x, ev.Ch)
+					WrtPos.x++
 				}
 			}
-			termbox.SetCursor(c.x, c.y)
-			DisplayPositon(c)
+			termbox.SetCursor(0, 0)
 		case termbox.EventError:
 			log.Fatal(ev.Err)
 		}
+		CopyScrnBufToTermBoxBuf(sb)
 		termbox.Flush()
+	}
+}
+
+// 以下、package化する前の試作用関数
+
+// CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
+func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
+	for i, r := range buf.Chr {
+		termbox.SetCell(i, 0, r, termbox.ColorBlue, termbox.ColorWhite)
 	}
 }
