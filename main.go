@@ -9,14 +9,19 @@ import (
 const ()
 
 type CurPos struct {
-	x uint
-	y uint
+	x int
+	y int
 }
 
 type WrtPos struct {
 	x uint
 	y uint
 }
+
+var (
+	cp CurPos
+	wp WrtPos
+)
 
 // TODO
 // goroutinr前提の設計とする
@@ -33,12 +38,11 @@ func main() {
 
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
 
-	termbox.SetCursor(0, 0)
+	termbox.SetCursor(cp.x, cp.y)
 	termbox.Flush()
 
 	sb := buffer.NewScenBuffer()
 
-	var x uint
 mainloop:
 	for {
 		switch ev := termbox.PollEvent(); ev.Type {
@@ -47,17 +51,19 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
-				sb.AddNewLine(WrtPos.x)
-				WrtPos.x++
+				sb.AddNewLine(wp.x)
+				cp.x++
+				wp.x++
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.WriteChrToSBuf(WrtPos.x, ev.Ch)
-					WrtPos.x++
+					sb.WriteChrToSBuf(wp.x, ev.Ch)
+					cp.x++
+					wp.x++
 				}
 			}
-			termbox.SetCursor(0, 0)
+			termbox.SetCursor(cp.x, cp.y)
 		case termbox.EventError:
 			log.Fatal(ev.Err)
 		}
