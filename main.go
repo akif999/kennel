@@ -54,6 +54,8 @@ mainloop:
 				sb.AddNewLine(wp.x)
 				cp.x++
 				wp.x++
+				cp.x = 0
+				cp.y++
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 			case termbox.KeyCtrlS:
 			default:
@@ -76,7 +78,15 @@ mainloop:
 
 // CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
 func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
-	for i, r := range buf.Chr {
-		termbox.SetCell(i, 0, r, termbox.ColorBlue, termbox.ColorWhite)
+	x := 0
+	y := 0
+	for _, r := range buf.Chr {
+		if r == rune('\n') {
+			x = 0
+			y++
+		} else {
+			termbox.SetCell(x, y, r, termbox.ColorBlue, termbox.ColorWhite)
+			x++
+		}
 	}
 }
