@@ -8,25 +8,20 @@ import (
 
 const ()
 
-type CurPos struct {
+var (
+	cp Cursol
+)
+
+type Cursol struct {
 	x int
 	y int
 }
 
-type WrtPos struct {
-	x uint
-	y uint
-}
-
-var (
-	cp CurPos
-	wp WrtPos
-)
-
 // TODO
-// goroutinr前提の設計とする
-// まずはbufferパッケージの機能から実装してリライトする
-// 改行コードで改行する処理を実装する(CopyScrnBufToTermBoxBufの中でやる)
+// goroutine前提の設計とする
+// Backspaceの実装
+// Undo Redoの実装
+// Window関連の機能をWindowパッケージへ切り出す
 
 func main() {
 
@@ -38,7 +33,7 @@ func main() {
 
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
 
-	termbox.SetCursor(cp.x, cp.y)
+	termbox.SetCursor(0, 0)
 	termbox.Flush()
 
 	sb := buffer.NewScenBuffer()
@@ -51,18 +46,15 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
-				sb.AddNewLine(wp.x)
-				cp.x++
-				wp.x++
+				sb.AddNewLine()
 				cp.x = 0
 				cp.y++
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.WriteChrToSBuf(wp.x, ev.Ch)
+					sb.WriteChrToSBuf(ev.Ch)
 					cp.x++
-					wp.x++
 				}
 			}
 			termbox.SetCursor(cp.x, cp.y)
