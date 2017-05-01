@@ -8,8 +8,9 @@ import (
 )
 
 // TODO
-// bufferパッケージとしてリライトする
 // bufferとして必要なメンバ、機能を追加する
+// DelChrFromSBufのロジックを変更する(適切ではない可能性がある)
+// Cuesorの行上げや、行末制限を実装する
 
 type ScrnBuffer struct {
 	Chr []rune
@@ -33,8 +34,11 @@ func (b *ScrnBuffer) WriteChrToSBuf(chr rune) {
 
 // DelChrFromSBufは、内部バッファの位置(Pos)にある文字を削除する
 func (b *ScrnBuffer) DelChrFromSBuf() {
-	n := make([]rune, len(b.Chr))
+	if b.Pos == 0 {
+		return
+	}
 	b.Chr = append(b.Chr[:b.Pos-1], b.Chr[b.Pos:]...)
+	n := make([]rune, len(b.Chr))
 	copy(n, b.Chr)
 	b.Pos--
 }

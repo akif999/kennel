@@ -32,7 +32,6 @@ func main() {
 	defer termbox.Close()
 
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
-
 	termbox.SetCursor(0, 0)
 	termbox.Flush()
 
@@ -50,14 +49,18 @@ mainloop:
 				cp.x = 0
 				cp.y++
 			case termbox.KeyArrowLeft:
-				cp.x--
-				sb.Pos--
+				if cp.x != 0 {
+					cp.x--
+					sb.Pos--
+				}
 			case termbox.KeyArrowRight:
 				cp.x++
 				sb.Pos++
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
 				BackSpace(sb)
-				cp.x--
+				if cp.x != 0 {
+					cp.x--
+				}
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
@@ -78,8 +81,7 @@ mainloop:
 
 // CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
 func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
-	x := 0
-	y := 0
+	x, y := 0, 0
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
 	for _, r := range buf.Chr {
 		if r == rune('\n') {
