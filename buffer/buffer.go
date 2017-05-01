@@ -23,12 +23,20 @@ func NewScenBuffer() *ScrnBuffer {
 	return b
 }
 
-// WriteChrToSBufは、内部バッファの任意の座標へrune型の文字を書き込む
+// WriteChrToSBufは、内部バッファの位置(Pos)へrune型の文字を書き込む
 func (b *ScrnBuffer) WriteChrToSBuf(chr rune) {
 	b.Chr = append(b.Chr, 0)
 	copy(b.Chr[b.Pos+1:], b.Chr[b.Pos:])
 	b.Chr[b.Pos] = chr
 	b.Pos++
+}
+
+// DelChrFromSBufは、内部バッファの位置(Pos)にある文字を削除する
+func (b *ScrnBuffer) DelChrFromSBuf() {
+	n := make([]rune, len(b.Chr))
+	b.Chr = append(b.Chr[:b.Pos-1], b.Chr[b.Pos:]...)
+	copy(n, b.Chr)
+	b.Pos--
 }
 
 // AddNewLineは、内部バッファへ改行コードを追加する
@@ -38,6 +46,3 @@ func (b *ScrnBuffer) AddNewLine() {
 	b.Chr[b.Pos] = rune('\n')
 	b.Pos++
 }
-
-// 以下旧ソースのfunction
-// run & buildのため削除
