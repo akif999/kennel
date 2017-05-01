@@ -15,7 +15,6 @@ import (
 type ScrnBuffer struct {
 	Chr []rune
 	Pos int
-	// 2次元配列で保持しない(改行はあくまで改行コードで行う)
 }
 
 // NewScenBufferは、新たなScrnBuffer型の参照を返す
@@ -38,8 +37,6 @@ func (b *ScrnBuffer) DelChrFromSBuf() {
 		return
 	}
 	b.Chr = append(b.Chr[:b.Pos-1], b.Chr[b.Pos:]...)
-	n := make([]rune, len(b.Chr))
-	copy(n, b.Chr)
 	b.Pos--
 }
 

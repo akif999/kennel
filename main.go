@@ -31,10 +31,7 @@ func main() {
 	}
 	defer termbox.Close()
 
-	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
-	termbox.SetCursor(0, 0)
-	termbox.Flush()
-
+	Init()
 	sb := buffer.NewScenBuffer()
 
 mainloop:
@@ -78,8 +75,16 @@ mainloop:
 }
 
 // 以下、package化する前の試作用関数
+// 現段階では、Window Packageとする予定
 
 // CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
+
+func Init() {
+	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
+	termbox.SetCursor(0, 0)
+	termbox.Flush()
+}
+
 func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
 	x, y := 0, 0
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
@@ -96,4 +101,7 @@ func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
 
 func BackSpace(buf *buffer.ScrnBuffer) {
 	buf.DelChrFromSBuf()
+}
+
+func BackCursor() {
 }
