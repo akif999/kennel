@@ -61,7 +61,7 @@ mainloop:
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.WriteChrToSBuf(ev.Ch)
+					sb.WriteChrToSBuf(ev.Ch, cp.y)
 					cp.x++
 				}
 			}
