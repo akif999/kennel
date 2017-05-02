@@ -13,9 +13,9 @@ import (
 // Cuesorの行上げや、行末制限を実装する
 
 type ScrnBuffer struct {
-	Chr     []rune
-	LineCap []int
-	Pos     int
+	Chr      []rune
+	LineLens []int
+	Pos      int
 }
 
 // NewScenBufferは、新たなScrnBuffer型の参照を返す
@@ -30,7 +30,7 @@ func (b *ScrnBuffer) WriteChrToSBuf(chr rune, row int) {
 	copy(b.Chr[b.Pos+1:], b.Chr[b.Pos:])
 	b.Chr[b.Pos] = chr
 	b.Pos++
-	// b.LineCap[row]++
+	b.LineLens[row]++
 }
 
 // DelChrFromSBufは、内部バッファの位置(Pos)にある文字を削除する
@@ -48,4 +48,5 @@ func (b *ScrnBuffer) AddNewLine() {
 	copy(b.Chr[b.Pos+1:], b.Chr[b.Pos:])
 	b.Chr[b.Pos] = rune('\n')
 	b.Pos++
+	b.LineLens = append(b.LineLens, 0)
 }

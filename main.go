@@ -33,6 +33,7 @@ func main() {
 
 	Init()
 	sb := buffer.NewScenBuffer()
+	sb.LineLens = append(sb.LineLens, 0)
 
 mainloop:
 	for {
