@@ -3,37 +3,37 @@ package main
 import (
 	"./buffer"
 	"github.com/nsf/termbox-go"
+	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
 )
 
 const ()
 
 var (
-	cp Cursol
+	debug = kingpin.Flag("debug", "Set debug mode").Bool()
+
+	cu Cursor
 )
 
-type Cursol struct {
-	x int
-	y int
+type Cursor struct {
+	x           int
+	y           int
+	LineLengths []int
 }
 
-// TODO
-// goroutine前提の設計とする
-// Backspaceの実装
-// Undo Redoの実装
-// Window関連の機能をWindowパッケージへ切り出す
+func Debug() {
+}
 
 func main() {
 
-	err := termbox.Init()
+	err := Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer termbox.Close()
 
-	Init()
 	sb := buffer.NewScenBuffer()
-	sb.LineLens = append(sb.LineLens, 0)
+	sb.LineLengths = append(sb.LineLengths, 0)
 
 mainloop:
 	for {
@@ -43,49 +43,49 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
-				sb.AddNewLine()
-				cp.x = 0
-				cp.y++
+				LineFeed(sb)
+			case termbox.KeyArrowUp:
+				cu.MoveCursorToUpper()
+			case termbox.KeyArrowDown:
+				cu.MoveCursorToLower()
 			case termbox.KeyArrowLeft:
-				if cp.x != 0 {
-					cp.x--
-					sb.Pos--
-				}
+				cu.MoveCursorToLeft()
 			case termbox.KeyArrowRight:
-				cp.x++
-				sb.Pos++
+				cu.MoveCursorToRight()
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				BackSpace(sb)
-				if cp.x != 0 {
-					cp.x--
-				}
+				sb.ConvertCursorToBufPos(cu.x, cu.y)
+				BackSpace(sb, cu.y)
+				cu.CopyLineLength(sb.LineLengths)
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.WriteChrToSBuf(ev.Ch, cp.y)
-					cp.x++
+					sb.ConvertCursorToBufPos(cu.x, cu.y)
+					sb.WriteChrToSBuf(ev.Ch, cu.y)
+					cu.CopyLineLength(sb.LineLengths)
+					cu.x++
 				}
 			}
-			termbox.SetCursor(cp.x, cp.y)
+			termbox.SetCursor(cu.x, cu.y)
 		case termbox.EventError:
 			log.Fatal(ev.Err)
 		}
 		CopyScrnBufToTermBoxBuf(sb)
 		termbox.Flush()
+		if *debug {
+			Debug()
+		}
 	}
 }
 
-// 以下、package化する前の試作用関数
-// 現段階では、Window Packageとする予定
-
-// CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
-
-func Init() {
+func Init() error {
+	err := termbox.Init()
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
 	termbox.SetCursor(0, 0)
 	termbox.Flush()
+	return err
 }
 
+// CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
 func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
 	x, y := 0, 0
 	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
@@ -100,9 +100,35 @@ func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
 	}
 }
 
-func BackSpace(buf *buffer.ScrnBuffer) {
-	buf.DelChrFromSBuf()
+func LineFeed(buf *buffer.ScrnBuffer) {
+	buf.AddNewLine()
+	cu.x = 0
+	cu.y++
 }
 
-func BackCursor() {
+func BackSpace(buf *buffer.ScrnBuffer, row int) {
+	buf.DelChrFromSBuf(row)
+	if cu.x != 0 {
+		cu.x--
+	}
+}
+
+func (c *Cursor) MoveCursorToUpper() {
+}
+
+func (c *Cursor) MoveCursorToLower() {
+}
+
+func (c *Cursor) MoveCursorToLeft() {
+	if c.x != 0 {
+		c.x--
+	}
+}
+
+func (c *Cursor) MoveCursorToRight() {
+	c.x++
+}
+
+func (c *Cursor) CopyLineLength(lens []int) {
+	c.LineLengths = lens
 }

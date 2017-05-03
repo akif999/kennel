@@ -1,21 +1,11 @@
 package buffer
 
-import (
-// "github.com/nsf/termbox-go"
-// "io/ioutil"
-//"os"
-//"strconv"
-)
-
-// TODO
-// bufferとして必要なメンバ、機能を追加する
-// DelChrFromSBufのロジックを変更する(適切ではない可能性がある)
-// Cuesorの行上げや、行末制限を実装する
+import ()
 
 type ScrnBuffer struct {
-	Chr      []rune
-	LineLens []int
-	Pos      int
+	Chr         []rune
+	LineLengths []int
+	Pos         int
 }
 
 // NewScenBufferは、新たなScrnBuffer型の参照を返す
@@ -29,17 +19,16 @@ func (b *ScrnBuffer) WriteChrToSBuf(chr rune, row int) {
 	b.Chr = append(b.Chr, 0)
 	copy(b.Chr[b.Pos+1:], b.Chr[b.Pos:])
 	b.Chr[b.Pos] = chr
-	b.Pos++
-	b.LineLens[row]++
+	b.LineLengths[row]++
 }
 
 // DelChrFromSBufは、内部バッファの位置(Pos)にある文字を削除する
-func (b *ScrnBuffer) DelChrFromSBuf() {
+func (b *ScrnBuffer) DelChrFromSBuf(row int) {
 	if b.Pos == 0 {
 		return
 	}
 	b.Chr = append(b.Chr[:b.Pos-1], b.Chr[b.Pos:]...)
-	b.Pos--
+	b.LineLengths[row]--
 }
 
 // AddNewLineは、内部バッファへ改行コードを追加する
@@ -48,5 +37,19 @@ func (b *ScrnBuffer) AddNewLine() {
 	copy(b.Chr[b.Pos+1:], b.Chr[b.Pos:])
 	b.Chr[b.Pos] = rune('\n')
 	b.Pos++
-	b.LineLens = append(b.LineLens, 0)
+	b.LineLengths = append(b.LineLengths, 0)
+}
+
+func (b *ScrnBuffer) ConvertCursorToBufPos(row int, col int) {
+	b.Pos = 0
+	for i, l := range b.LineLengths {
+		if col == 0 || col == l {
+			b.Pos = (b.Pos + (l - col))
+		} else {
+			b.Pos = (b.Pos + (l - col)) - 1
+		}
+		if i == row {
+			break
+		}
+	}
 }
