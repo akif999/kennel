@@ -11,7 +11,7 @@ import (
 const ()
 
 var (
-	debug = kingpin.Flag("debug", "Set debug mode").Default("false").Bool()
+	debug = kingpin.Flag("debug", "Set debug mode").Short('d').Default("false").Bool()
 
 	cu Cursor
 )
