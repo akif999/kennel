@@ -3,7 +3,7 @@ package main
 import (
 	"./buffer"
 	"./control"
-	// "./window"
+	"./window"
 	"github.com/nsf/termbox-go"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
@@ -84,7 +84,7 @@ mainloop:
 		case termbox.EventError:
 			log.Fatal(ev.Err)
 		}
-		CopyScrnBufToTermBoxBuf(sb)
+		window.CopyScrnBufToTermBoxBuf(sb)
 		if *debug == true {
 			Debug(sb, cu, cu.Y)
 		}
@@ -98,21 +98,6 @@ func Init() error {
 	termbox.SetCursor(0, 0)
 	termbox.Flush()
 	return err
-}
-
-// CopyScrnBufToTermBoxBufは、引数で渡した内部バッファを、termboxのbackground bufferへコピーする
-func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
-	x, y := 0, 0
-	termbox.Clear(termbox.ColorBlue, termbox.ColorWhite)
-	for _, r := range buf.Chr {
-		if r == rune('\n') {
-			x = 0
-			y++
-		} else {
-			termbox.SetCell(x, y, r, termbox.ColorBlue, termbox.ColorWhite)
-			x++
-		}
-	}
 }
 
 func LineFeed(buf *buffer.ScrnBuffer, cu *control.Cursor) {
