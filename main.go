@@ -2,6 +2,7 @@ package main
 
 import (
 	"./buffer"
+	"./control"
 	// "./window"
 	"github.com/nsf/termbox-go"
 	"gopkg.in/alecthomas/kingpin.v2"
@@ -13,18 +14,11 @@ const ()
 
 var (
 	debug = kingpin.Flag("debug", "Set debug mode").Short('d').Default("false").Bool()
-
-	cu Cursor
 )
 
-type Cursor struct {
-	x int
-	y int
-}
-
-func Debug(buf *buffer.ScrnBuffer, row int) {
-	xpos := []rune(strconv.Itoa(cu.x))
-	ypos := []rune(strconv.Itoa(cu.y))
+func Debug(buf *buffer.ScrnBuffer, cu *control.Cursor, row int) {
+	xpos := []rune(strconv.Itoa(cu.X))
+	ypos := []rune(strconv.Itoa(cu.Y))
 	// llen := []rune(strconv.Itoa(cu.LineLengths[row]))
 	bpos := []rune(strconv.Itoa(buf.Pos))
 	for i, x := range xpos {
@@ -54,6 +48,7 @@ func main() {
 	defer termbox.Close()
 
 	sb := buffer.NewScenBuffer()
+	cu := control.NewCursor()
 	sb.LineLengths = append(sb.LineLengths, 0)
 
 mainloop:
@@ -64,7 +59,7 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			case termbox.KeyEnter:
-				LineFeed(sb)
+				LineFeed(sb, cu)
 			case termbox.KeyArrowUp:
 				cu.MoveCursorToUpper()
 			case termbox.KeyArrowDown:
@@ -74,24 +69,24 @@ mainloop:
 			case termbox.KeyArrowRight:
 				cu.MoveCursorToRight()
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				sb.ConvertCursorToBufPos(cu.y, cu.x)
-				BackSpace(sb, cu.y)
+				sb.ConvertCursorToBufPos(cu.Y, cu.X)
+				BackSpace(sb, cu, cu.Y)
 				cu.MoveCursorToLeft()
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.ConvertCursorToBufPos(cu.y, cu.x)
-					sb.WriteChrToSBuf(ev.Ch, cu.y)
+					sb.ConvertCursorToBufPos(cu.Y, cu.X)
+					sb.WriteChrToSBuf(ev.Ch, cu.Y)
 					cu.MoveCursorToRight()
 				}
 			}
-			termbox.SetCursor(cu.x, cu.y)
+			termbox.SetCursor(cu.X, cu.Y)
 		case termbox.EventError:
 			log.Fatal(ev.Err)
 		}
 		CopyScrnBufToTermBoxBuf(sb)
 		if *debug == true {
-			Debug(sb, cu.y)
+			Debug(sb, cu, cu.Y)
 		}
 		termbox.Flush()
 	}
@@ -120,34 +115,15 @@ func CopyScrnBufToTermBoxBuf(buf *buffer.ScrnBuffer) {
 	}
 }
 
-func LineFeed(buf *buffer.ScrnBuffer) {
+func LineFeed(buf *buffer.ScrnBuffer, cu *control.Cursor) {
 	buf.AddNewLine()
-	cu.x = 0
-	cu.y++
+	cu.X = 0
+	cu.Y++
 }
 
-func BackSpace(buf *buffer.ScrnBuffer, row int) {
+func BackSpace(buf *buffer.ScrnBuffer, cu *control.Cursor, row int) {
 	buf.DelChrFromSBuf(row)
-	if cu.x != 0 {
-		cu.x--
+	if cu.X != 0 {
+		cu.X--
 	}
-}
-
-func (c *Cursor) MoveCursorToUpper() {
-}
-
-func (c *Cursor) MoveCursorToLower() {
-}
-
-func (c *Cursor) MoveCursorToLeft() {
-	if c.x != 0 {
-		c.x--
-	}
-}
-
-func (c *Cursor) MoveCursorToRight() {
-	c.x++
-}
-
-func (c *Cursor) CopyLineLength(lens []int) {
 }
