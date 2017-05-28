@@ -2,6 +2,7 @@ package main
 
 import (
 	"./buffer"
+	// "./window"
 	"github.com/nsf/termbox-go"
 	"gopkg.in/alecthomas/kingpin.v2"
 	"log"
@@ -17,15 +18,14 @@ var (
 )
 
 type Cursor struct {
-	x           int
-	y           int
-	LineLengths []int
+	x int
+	y int
 }
 
 func Debug(buf *buffer.ScrnBuffer, row int) {
 	xpos := []rune(strconv.Itoa(cu.x))
 	ypos := []rune(strconv.Itoa(cu.y))
-	llen := []rune(strconv.Itoa(cu.LineLengths[row]))
+	// llen := []rune(strconv.Itoa(cu.LineLengths[row]))
 	bpos := []rune(strconv.Itoa(buf.Pos))
 	for i, x := range xpos {
 		termbox.SetCell(i, 25, x, termbox.ColorBlue, termbox.ColorWhite)
@@ -33,9 +33,11 @@ func Debug(buf *buffer.ScrnBuffer, row int) {
 	for i, y := range ypos {
 		termbox.SetCell(i, 26, y, termbox.ColorBlue, termbox.ColorWhite)
 	}
-	for i, l := range llen {
-		termbox.SetCell(i, 27, l, termbox.ColorBlue, termbox.ColorWhite)
-	}
+	/*
+		for i, l := range llen {
+			termbox.SetCell(i, 27, l, termbox.ColorBlue, termbox.ColorWhite)
+		}
+	*/
 	for i, p := range bpos {
 		termbox.SetCell(i, 28, p, termbox.ColorBlue, termbox.ColorWhite)
 	}
@@ -63,7 +65,6 @@ mainloop:
 				break mainloop
 			case termbox.KeyEnter:
 				LineFeed(sb)
-				cu.CopyLineLength(sb.LineLengths)
 			case termbox.KeyArrowUp:
 				cu.MoveCursorToUpper()
 			case termbox.KeyArrowDown:
@@ -73,17 +74,15 @@ mainloop:
 			case termbox.KeyArrowRight:
 				cu.MoveCursorToRight()
 			case termbox.KeyBackspace, termbox.KeyBackspace2:
-				sb.ConvertCursorToBufPos(cu.x, cu.y)
+				sb.ConvertCursorToBufPos(cu.y, cu.x)
 				BackSpace(sb, cu.y)
 				cu.MoveCursorToLeft()
-				cu.CopyLineLength(sb.LineLengths)
 			case termbox.KeyCtrlS:
 			default:
 				if ev.Ch != 0 {
-					sb.ConvertCursorToBufPos(cu.x, cu.y)
+					sb.ConvertCursorToBufPos(cu.y, cu.x)
 					sb.WriteChrToSBuf(ev.Ch, cu.y)
 					cu.MoveCursorToRight()
-					cu.CopyLineLength(sb.LineLengths)
 				}
 			}
 			termbox.SetCursor(cu.x, cu.y)
@@ -151,5 +150,4 @@ func (c *Cursor) MoveCursorToRight() {
 }
 
 func (c *Cursor) CopyLineLength(lens []int) {
-	c.LineLengths = lens
 }
