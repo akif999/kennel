@@ -18,13 +18,14 @@ func End() {
 }
 
 func Run() error {
+	c := command.NewCommandSet()
 mainloop:
 	for {
-		c, err := command.ParseKeyToCommand(termbox.PollEvent())
+		err := c.Parse(termbox.PollEvent())
 		if err != nil {
 			return err
 		}
-		switch c {
+		switch c.Cmd {
 		case command.QuitApp:
 			break mainloop
 		}

@@ -2,6 +2,11 @@ package command
 
 import termbox "github.com/nsf/termbox-go"
 
+type CommandSet struct {
+	Cmd Command
+	Chr rune
+}
+
 type Command int
 
 const (
@@ -10,12 +15,16 @@ const (
 	NilCmd  Command = 2
 )
 
-func ParseKeyToCommand(event termbox.Event) (cmd Command, err error) {
+func NewCommandSet() *CommandSet {
+	return &CommandSet{}
+}
+
+func (c *CommandSet) Parse(event termbox.Event) error {
 	switch event.Type {
 	case termbox.EventKey:
 		switch event.Key {
 		case termbox.KeyEsc:
-			return QuitApp, nil
+			c.Cmd = QuitApp
 		case termbox.KeyEnter:
 		case termbox.KeyArrowUp:
 		case termbox.KeyArrowDown:
@@ -28,7 +37,7 @@ func ParseKeyToCommand(event termbox.Event) (cmd Command, err error) {
 			}
 		}
 	case termbox.EventError:
-		return NilCmd, event.Err
+		return event.Err
 	}
-	return NilCmd, nil
+	return nil
 }
