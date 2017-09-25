@@ -16,13 +16,17 @@ func main() {
 
 	kingpin.Parse()
 
-	err := Init()
+	app := NewApp()
+
+	err := app.Init()
 	if err != nil {
+		app.End()
 		log.Fatal(err)
 	}
-	err = Run()
+	err = app.Run()
 	if err != nil {
+		app.End()
 		log.Fatal(err)
 	}
-	End()
+	app.End()
 }

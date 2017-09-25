@@ -11,8 +11,7 @@ type Command int
 
 const (
 	QuitApp Command = 0
-	DmyCmd  Command = 1
-	NilCmd  Command = 2
+	Chr     Command = 1
 )
 
 func NewCommandSet() *CommandSet {
@@ -34,6 +33,8 @@ func (c *CommandSet) Parse(event termbox.Event) error {
 		case termbox.KeyCtrlS:
 		default:
 			if event.Ch != 0 {
+				c.Cmd = Chr
+				c.Chr = event.Ch
 			}
 		}
 	case termbox.EventError:
