@@ -25,6 +25,8 @@ func (c *CommandSet) Parse(event termbox.Event) error {
 		case termbox.KeyEsc:
 			c.Cmd = QuitApp
 		case termbox.KeyEnter:
+			c.Cmd = Chr
+			c.Chr = '\n'
 		case termbox.KeyArrowUp:
 		case termbox.KeyArrowDown:
 		case termbox.KeyArrowLeft:
