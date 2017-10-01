@@ -46,7 +46,7 @@ mainloop:
 		case command.Chr:
 			a.Chr(c, 0, 0)
 		}
-		a.Draw()
+		a.Draw(0, 0)
 		termbox.Flush()
 	}
 	return nil
@@ -56,6 +56,14 @@ func (a *App) Chr(c *command.CommandSet, PageNum, WindowNum int) {
 	a.Pages[PageNum].Windows[WindowNum].Buf.Insert(c.Chr)
 }
 
-func (a *App) Draw() {
-	termbox.SetCell(0, 0, a.Pages[0].Windows[0].Buf.Runes[0], termbox.ColorWhite, termbox.ColorBlack)
+func (a *App) Draw(pageNum, WinNum int) {
+	x, y := 0, 0
+	for _, r := range a.Pages[pageNum].Windows[WinNum].Buf.Runes {
+		termbox.SetCell(x, y, r, termbox.ColorWhite, termbox.ColorBlack)
+		x++
+		if r == '\n' {
+			x = 0
+			y++
+		}
+	}
 }
