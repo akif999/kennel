@@ -28,7 +28,7 @@ func (a *App) Init() error {
 }
 
 func (a *App) End() {
-	defer termbox.Close()
+	termbox.Close()
 }
 
 func (a *App) Run() error {
@@ -44,26 +44,23 @@ mainloop:
 		case command.QuitApp:
 			break mainloop
 		case command.Chr:
-			a.Chr(c, 0, 0)
+			a.Chr(c.Chr, 0, 0)
 		}
 		a.Draw(0, 0)
+		a.UpdateCursor(0, 0)
 		termbox.Flush()
 	}
 	return nil
 }
 
-func (a *App) Chr(c *command.CommandSet, PageNum, WindowNum int) {
-	a.Pages[PageNum].Windows[WindowNum].Buf.Insert(c.Chr)
+func (a *App) Chr(chr rune, PageNum, WinNum int) {
+	a.Pages[PageNum].Insert(chr, WinNum)
 }
 
 func (a *App) Draw(pageNum, WinNum int) {
-	x, y := 0, 0
-	for _, r := range a.Pages[pageNum].Windows[WinNum].Buf.Runes {
-		termbox.SetCell(x, y, r, termbox.ColorWhite, termbox.ColorBlack)
-		x++
-		if r == '\n' {
-			x = 0
-			y++
-		}
-	}
+	a.Pages[pageNum].Draw(WinNum)
+}
+
+func (a *App) UpdateCursor(pageNum, WinNum int) {
+	a.Pages[pageNum].UpdateCursor(WinNum)
 }
