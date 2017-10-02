@@ -21,10 +21,13 @@ func (a *App) Init() error {
 	a.Pages[0].Windows = append(a.Pages[0].Windows, window.NewWindow())
 	a.Pages[0].Windows[0].Buf = buffer.NewBuffer()
 	err := termbox.Init()
+	if err != nil {
+		return err
+	}
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	termbox.SetCursor(0, 0)
 	termbox.Flush()
-	return err
+	return nil
 }
 
 func (a *App) End() {
