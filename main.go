@@ -3,30 +3,37 @@ package main
 import (
 	"log"
 
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/nsf/termbox-go"
 )
 
-const ()
+type buffer struct {
+	lines []line
+}
 
-var (
-	debug = kingpin.Flag("debug", "Set debug mode").Short('d').Default("false").Bool()
-)
+type line struct {
+	text []rune
+}
 
 func main() {
-
-	kingpin.Parse()
-
-	app := NewApp()
-
-	err := app.Init()
+	err := termbox.Init()
 	if err != nil {
-		app.End()
 		log.Fatal(err)
 	}
-	err = app.Run()
-	if err != nil {
-		app.End()
-		log.Fatal(err)
+	defer termbox.Close()
+	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
+	termbox.SetCursor(0, 0)
+
+mainloop:
+	for {
+		switch ev := termbox.PollEvent(); ev.Type {
+		case termbox.EventKey:
+			switch ev.Key {
+			case termbox.KeyEsc:
+				break mainloop
+			default:
+				termbox.SetCell(0, 0, ev.Ch, termbox.ColorWhite, termbox.ColorBlack)
+			}
+		}
+		termbox.Flush()
 	}
-	app.End()
 }
