@@ -88,14 +88,10 @@ func (b *buffer) insertChr(r rune) {
 }
 
 func (l *line) insertChr(r rune, p int) {
-	if l.runenum() == 0 {
-		l.text = append(l.text, r)
-	} else {
-		t := make([]rune, len(l.text), cap(l.text)+1)
-		copy(t, l.text)
-		l.text = append(t[:p+1], t[p:]...)
-		l.text[p] = r
-	}
+	t := make([]rune, len(l.text), cap(l.text)+1)
+	copy(t, l.text)
+	l.text = append(t[:p+1], t[p:]...)
+	l.text[p] = r
 }
 
 func (b *buffer) updateLine() {
