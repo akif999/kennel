@@ -41,9 +41,7 @@ func main() {
 		},
 		lines: []*line{
 			&line{
-				text: []rune{
-					0,
-				},
+				text: []rune{},
 			},
 		},
 	}
@@ -90,8 +88,14 @@ func (b *buffer) insertChr(r rune) {
 }
 
 func (l *line) insertChr(r rune, p int) {
-	l.text = append(l.text[:p+1], l.text[p:]...)
-	l.text[p] = r
+	if l.runenum() == 0 {
+		l.text = append(l.text, r)
+	} else {
+		t := make([]rune, len(l.text), cap(l.text)+1)
+		copy(t, l.text)
+		l.text = append(t[:p+1], t[p:]...)
+		l.text[p] = r
+	}
 }
 
 func (b *buffer) updateLine() {
@@ -108,7 +112,7 @@ func (b *buffer) moveCursor(d int) {
 		}
 		break
 	case Down:
-		if b.cursor.y < b.linenum() {
+		if b.cursor.y < b.linenum()-1 {
 			b.cursor.y++
 		}
 		break
