@@ -52,6 +52,7 @@ mainloop:
 		case termbox.EventKey:
 			switch ev.Key {
 			case termbox.KeyEnter:
+				buf.lineFeed()
 			case termbox.KeyArrowUp:
 				buf.moveCursor(Up)
 			case termbox.KeyArrowDown:
@@ -80,6 +81,12 @@ func startUp() error {
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	termbox.SetCursor(0, 0)
 	return nil
+}
+
+func (b *buffer) lineFeed() {
+	b.lines = append(b.lines, new(line))
+	b.cursor.x = 0
+	b.cursor.y++
 }
 
 func (b *buffer) insertChr(r rune) {
