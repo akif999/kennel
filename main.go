@@ -67,7 +67,7 @@ mainloop:
 				buf.insertChr(ev.Ch)
 			}
 		}
-		buf.updateLine()
+		buf.updateLines()
 		buf.updateCursor()
 		termbox.Flush()
 	}
@@ -84,7 +84,12 @@ func startUp() error {
 }
 
 func (b *buffer) lineFeed() {
-	b.lines = append(b.lines, new(line))
+	p := b.cursor.y + 1
+	t := make([]*line, len(b.lines), cap(b.lines)+1)
+	copy(t, b.lines)
+	b.lines = append(t[:p+1], t[p:]...)
+	b.lines[p] = new(line)
+
 	b.cursor.x = 0
 	b.cursor.y++
 }
@@ -101,9 +106,12 @@ func (l *line) insertChr(r rune, p int) {
 	l.text[p] = r
 }
 
-func (b *buffer) updateLine() {
-	for i, r := range b.lines[b.cursor.y].text {
-		termbox.SetCell(i, b.cursor.y, r, termbox.ColorWhite, termbox.ColorBlack)
+func (b *buffer) updateLines() {
+	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
+	for y, l := range b.lines {
+		for x, r := range l.text {
+			termbox.SetCell(x, y, r, termbox.ColorWhite, termbox.ColorBlack)
+		}
 	}
 }
 
