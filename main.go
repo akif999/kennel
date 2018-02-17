@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/nsf/termbox-go"
+	termbox "github.com/nsf/termbox-go"
 )
 
 const (
@@ -118,13 +118,23 @@ func (b *buffer) updateLines() {
 func (b *buffer) moveCursor(d int) {
 	switch d {
 	case Up:
+		// guard of top of "rows"
 		if b.cursor.y > 0 {
 			b.cursor.y--
+			// guard of end of "row"
+			if b.cursor.x > len(b.lines[b.cursor.y].text) {
+				b.cursor.x = len(b.lines[b.cursor.y].text)
+			}
 		}
 		break
 	case Down:
+		// guard of end of "rows"
 		if b.cursor.y < b.linenum()-1 {
 			b.cursor.y++
+			// guard of end of "row"
+			if b.cursor.x > len(b.lines[b.cursor.y].text) {
+				b.cursor.x = len(b.lines[b.cursor.y].text)
+			}
 		}
 		break
 	case Left:
