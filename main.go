@@ -85,10 +85,17 @@ func startUp() error {
 
 func (b *buffer) lineFeed() {
 	p := b.cursor.y + 1
+	// split line by the cursor and store these
+	fh, lh := b.lines[b.cursor.y].split(b.cursor.x)
+
 	t := make([]*line, len(b.lines), cap(b.lines)+1)
 	copy(t, b.lines)
 	b.lines = append(t[:p+1], t[p:]...)
 	b.lines[p] = new(line)
+
+	// write back previous line and newline
+	b.lines[p-1].text = fh
+	b.lines[p].text = lh
 
 	b.cursor.x = 0
 	b.cursor.y++
@@ -175,8 +182,8 @@ func (l *line) runenum() int {
 	return len(l.text)
 }
 
-func (l *line) split() *line {
-	return nil
+func (l *line) split(pos int) ([]rune, []rune) {
+	return l.text[:pos], l.text[pos:]
 }
 
 func (l *line) joint() *line {
