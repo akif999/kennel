@@ -162,3 +162,17 @@ func (b *buffer) linenum() int {
 func (l *line) runenum() int {
 	return len(l.text)
 }
+
+func (l *line) split() *line {
+	return nil
+}
+
+func (l *line) joint() *line {
+	return nil
+}
+
+func (b *buffer) deleteLine() {
+}
+
+func (b *buffer) addLine() {
+}
