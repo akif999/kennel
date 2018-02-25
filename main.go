@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	termbox "github.com/nsf/termbox-go"
 )
@@ -53,6 +54,11 @@ mainloop:
 			switch ev.Key {
 			case termbox.KeyEnter:
 				buf.lineFeed()
+			// mac delete-key is this
+			case termbox.KeyCtrlH:
+				fallthrough
+			case termbox.KeyBackspace2:
+				buf.backSpace()
 			case termbox.KeyArrowUp:
 				buf.moveCursor(Up)
 			case termbox.KeyArrowDown:
@@ -99,6 +105,10 @@ func (b *buffer) lineFeed() {
 
 	b.cursor.x = 0
 	b.cursor.y++
+}
+
+func (b *buffer) backSpace() {
+	os.Exit(0)
 }
 
 func (b *buffer) insertChr(r rune) {
