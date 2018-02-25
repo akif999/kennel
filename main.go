@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	termbox "github.com/nsf/termbox-go"
 )
@@ -108,7 +107,24 @@ func (b *buffer) lineFeed() {
 }
 
 func (b *buffer) backSpace() {
-	os.Exit(0)
+	if b.cursor.x == 0 && b.cursor.y == 0 {
+		// nothing to do
+	} else {
+		if b.cursor.x == 0 {
+			// store current line
+			t := b.lines[b.cursor.y].text
+			// delete current line
+			b.lines = append(b.lines[:b.cursor.y], b.lines[b.cursor.y+1:]...)
+			b.cursor.y--
+			// // join stored lines to previous line-end
+			plen := b.lines[b.cursor.y].text
+			b.lines[b.cursor.y].text = append(b.lines[b.cursor.y].text, t...)
+			b.cursor.x = len(plen)
+		} else {
+			b.lines[b.cursor.y].deleteChr(b.cursor.x)
+			b.cursor.x--
+		}
+	}
 }
 
 func (b *buffer) insertChr(r rune) {
@@ -121,6 +137,11 @@ func (l *line) insertChr(r rune, p int) {
 	copy(t, l.text)
 	l.text = append(t[:p+1], t[p:]...)
 	l.text[p] = r
+}
+
+func (l *line) deleteChr(p int) {
+	p = p - 1
+	l.text = append(l.text[:p], l.text[p+1:]...)
 }
 
 func (b *buffer) updateLines() {
