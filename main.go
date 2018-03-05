@@ -18,6 +18,15 @@ const (
 	Right
 )
 
+var (
+	undoBuf = &bufStack{}
+	redoBuf = &bufStack{}
+)
+
+type bufStack struct {
+	bufs []*buffer
+}
+
 type buffer struct {
 	cursor cursor
 	lines  []*line
@@ -56,6 +65,7 @@ func main() {
 	}
 	buf.updateLines()
 	buf.updateCursor()
+	buf.pushBufToUndoRedoBuffer()
 	termbox.Flush()
 
 mainloop:
@@ -78,6 +88,10 @@ mainloop:
 				buf.moveCursor(Left)
 			case termbox.KeyArrowRight:
 				buf.moveCursor(Right)
+			case termbox.KeyCtrlZ:
+				buf.undo()
+			case termbox.KeyCtrlY:
+				buf.redo()
 			case termbox.KeyCtrlS:
 				buf.writeBufToFile()
 			case termbox.KeyEsc:
@@ -88,6 +102,7 @@ mainloop:
 		}
 		buf.updateLines()
 		buf.updateCursor()
+		buf.pushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}
 }
@@ -234,11 +249,50 @@ func (l *line) split(pos int) ([]rune, []rune) {
 func (l *line) joint() *line {
 	return nil
 }
-
-func (b *buffer) deleteLine() {
+func (b *buffer) pushBufToUndoRedoBuffer() {
+	tb := new(buffer)
+	tb.cursor.x = b.cursor.x
+	tb.cursor.y = b.cursor.y
+	for i, l := range b.lines {
+		tl := new(line)
+		tb.lines = append(tb.lines, tl)
+		tb.lines[i].text = l.text
+	}
+	undoBuf.bufs = append(undoBuf.bufs, tb)
 }
 
-func (b *buffer) addLine() {
+func (b *buffer) undo() {
+	if len(undoBuf.bufs) == 0 {
+		return
+	}
+	if len(undoBuf.bufs) > 1 {
+		redoBuf.bufs = append(redoBuf.bufs, undoBuf.bufs[len(undoBuf.bufs)-1])
+		undoBuf.bufs = undoBuf.bufs[:len(undoBuf.bufs)-1]
+	}
+	tb := undoBuf.bufs[len(undoBuf.bufs)-1]
+	undoBuf.bufs = undoBuf.bufs[:len(undoBuf.bufs)-1]
+	b.cursor.x = tb.cursor.x
+	b.cursor.y = tb.cursor.y
+	for i, l := range tb.lines {
+		tl := new(line)
+		b.lines = append(b.lines, tl)
+		b.lines[i].text = l.text
+	}
+}
+
+func (b *buffer) redo() {
+	if len(redoBuf.bufs) == 0 {
+		return
+	}
+	tb := redoBuf.bufs[len(redoBuf.bufs)-1]
+	redoBuf.bufs = redoBuf.bufs[:len(redoBuf.bufs)-1]
+	b.cursor.x = tb.cursor.x
+	b.cursor.y = tb.cursor.y
+	for i, l := range tb.lines {
+		tl := new(line)
+		b.lines = append(b.lines, tl)
+		b.lines[i].text = l.text
+	}
 }
 
 func (b *buffer) readFileToBuf(reader io.Reader) error {
