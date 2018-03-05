@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -77,6 +78,8 @@ mainloop:
 				buf.moveCursor(Left)
 			case termbox.KeyArrowRight:
 				buf.moveCursor(Right)
+			case termbox.KeyCtrlS:
+				buf.writeBufToFile()
 			case termbox.KeyEsc:
 				break mainloop
 			default:
@@ -249,4 +252,13 @@ func (b *buffer) readFileToBuf(reader io.Reader) error {
 		return err
 	}
 	return nil
+}
+
+func (b *buffer) writeBufToFile() {
+	content := make([]byte, 1024)
+	for _, l := range b.lines {
+		l.text = append(l.text, '\n')
+		content = append(content, string(l.text)...)
+	}
+	ioutil.WriteFile("./output.txt", content, os.ModePerm)
 }
