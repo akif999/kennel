@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
+	"io"
 	"log"
+	"os"
 
 	termbox "github.com/nsf/termbox-go"
 )
@@ -28,23 +32,30 @@ type line struct {
 }
 
 func main() {
+	filename := ""
+	fmt.Print(len(os.Args))
+	if len(os.Args) > 1 {
+		filename = os.Args[1]
+	}
 	err := startUp()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer termbox.Close()
 
-	buf := &buffer{
-		cursor: cursor{
-			x: 0,
-			y: 0,
-		},
-		lines: []*line{
-			&line{
-				text: []rune{},
-			},
-		},
+	buf := new(buffer)
+	if filename == "" {
+		buf.lines = []*line{&line{[]rune{}}}
+	} else {
+		file, err := os.Open(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		buf.readFileToBuf(file)
 	}
+	buf.updateLines()
+	buf.updateCursor()
+	termbox.Flush()
 
 mainloop:
 	for {
@@ -225,4 +236,17 @@ func (b *buffer) deleteLine() {
 }
 
 func (b *buffer) addLine() {
+}
+
+func (b *buffer) readFileToBuf(reader io.Reader) error {
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		l := new(line)
+		l.text = []rune(scanner.Text())
+		b.lines = append(b.lines, l)
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	return nil
 }
