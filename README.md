@@ -2,6 +2,7 @@
 
 ## What is this
 Kennel is a Text editor that wrote by Go.  
+this software runs on the command line interface.  
 it has only few functions.  
 developing by author now.  
 
@@ -53,7 +54,7 @@ Kennel has the following functions.
 * leaving app
     * `esc key`
 
-## Build && Installation
+## Build & Installation
 
 `$ go build main.go`
 
