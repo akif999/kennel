@@ -1,6 +1,6 @@
 # KENNEL
 
-## What is this
+## What is this ?
 Kennel is a Text editor that wrote by Go.  
 this software runs on the command line interface.  
 it has only few functions.  
