@@ -246,9 +246,6 @@ func (l *line) split(pos int) ([]rune, []rune) {
 	return l.text[:pos], l.text[pos:]
 }
 
-func (l *line) joint() *line {
-	return nil
-}
 func (b *buffer) pushBufToUndoRedoBuffer() {
 	tb := new(buffer)
 	tb.cursor.x = b.cursor.x
