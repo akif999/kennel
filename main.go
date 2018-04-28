@@ -1,10 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -290,26 +287,4 @@ func (b *buffer) redo() {
 		b.lines = append(b.lines, tl)
 		b.lines[i].text = l.text
 	}
-}
-
-func (b *buffer) readFileToBuf(reader io.Reader) error {
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		l := new(line)
-		l.text = []rune(scanner.Text())
-		b.lines = append(b.lines, l)
-	}
-	if err := scanner.Err(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (b *buffer) writeBufToFile() {
-	content := make([]byte, 1024)
-	for _, l := range b.lines {
-		l.text = append(l.text, '\n')
-		content = append(content, string(l.text)...)
-	}
-	ioutil.WriteFile("./output.txt", content, os.ModePerm)
 }
