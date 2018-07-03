@@ -21,7 +21,7 @@ func (b *buffer) readFileToBuf(reader io.Reader) error {
 }
 
 func (b *buffer) writeBufToFile() {
-	content := make([]byte, 1024)
+	content := []byte{}
 	for _, l := range b.lines {
 		l.text = append(l.text, '\n')
 		content = append(content, string(l.text)...)
