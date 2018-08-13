@@ -99,7 +99,12 @@ mainloop:
 			case termbox.KeyEsc:
 				break mainloop
 			default:
-				buf.insertChr(ev.Ch)
+				// convert null charactor by space to space
+				if ev.Ch == '\u0000' {
+					buf.insertChr(' ')
+				} else {
+					buf.insertChr(ev.Ch)
+				}
 			}
 		}
 		buf.updateLines()
