@@ -34,6 +34,11 @@ type cursor struct {
 	y int
 }
 
+type file struct {
+	path     string
+	filetype byte
+}
+
 type line struct {
 	text []rune
 }
