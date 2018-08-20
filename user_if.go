@@ -51,8 +51,8 @@ func (b *buffer) moveCursor(d int) {
 		if b.cursor.y > 0 {
 			b.cursor.y--
 			// guard of end of "row"
-			if b.cursor.x > len(b.lines[b.cursor.y].text) {
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+			if b.cursor.x > b.numOfColsOnCursor() {
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
@@ -61,8 +61,8 @@ func (b *buffer) moveCursor(d int) {
 		if b.cursor.y < b.numOfLines()-1 {
 			b.cursor.y++
 			// guard of end of "row"
-			if b.cursor.x > len(b.lines[b.cursor.y].text) {
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+			if b.cursor.x > b.numOfColsOnCursor() {
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
@@ -73,7 +73,7 @@ func (b *buffer) moveCursor(d int) {
 			// guard of top of "rows"
 			if b.cursor.y > 0 {
 				b.cursor.y--
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
