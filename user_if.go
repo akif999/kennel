@@ -58,7 +58,7 @@ func (b *buffer) moveCursor(d int) {
 		break
 	case Down:
 		// guard of end of "rows"
-		if b.cursor.y < b.linenum()-1 {
+		if b.cursor.y < b.numOfLines()-1 {
 			b.cursor.y++
 			// guard of end of "row"
 			if b.cursor.x > len(b.lines[b.cursor.y].text) {
@@ -82,7 +82,7 @@ func (b *buffer) moveCursor(d int) {
 			b.cursor.x++
 		} else {
 			// guard of end of "rows"
-			if b.cursor.y < b.linenum()-1 {
+			if b.cursor.y < b.numOfLines()-1 {
 				b.cursor.x = 0
 				b.cursor.y++
 			}
