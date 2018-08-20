@@ -100,28 +100,3 @@ func startUp() error {
 	termbox.SetCursor(0, 0)
 	return nil
 }
-
-func (b *buffer) updateLines() {
-	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
-	for y, l := range b.lines {
-		for x, r := range l.text {
-			termbox.SetCell(x, y, r, termbox.ColorWhite, termbox.ColorBlack)
-		}
-	}
-}
-
-func (b *buffer) updateCursor() {
-	termbox.SetCursor(b.cursor.x, b.cursor.y)
-}
-
-func (b *buffer) pushBufToUndoRedoBuffer() {
-	tb := new(buffer)
-	tb.cursor.x = b.cursor.x
-	tb.cursor.y = b.cursor.y
-	for i, l := range b.lines {
-		tl := new(line)
-		tb.lines = append(tb.lines, tl)
-		tb.lines[i].text = l.text
-	}
-	undoBuf.bufs = append(undoBuf.bufs, tb)
-}

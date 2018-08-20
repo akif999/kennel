@@ -1,23 +1,5 @@
 package main
 
-type bufStack struct {
-	bufs []*buffer
-}
-
-type buffer struct {
-	cursor cursor
-	lines  []*line
-}
-
-type cursor struct {
-	x int
-	y int
-}
-
-type line struct {
-	text []rune
-}
-
 func (b *buffer) lineFeed() {
 	p := b.cursor.y + 1
 	// split line by the cursor and store these
@@ -60,18 +42,6 @@ func (b *buffer) backSpace() {
 func (b *buffer) insertChr(r rune) {
 	b.lines[b.cursor.y].insertChr(r, b.cursor.x)
 	b.cursor.x++
-}
-
-func (l *line) insertChr(r rune, p int) {
-	t := make([]rune, len(l.text), cap(l.text)+1)
-	copy(t, l.text)
-	l.text = append(t[:p+1], t[p:]...)
-	l.text[p] = r
-}
-
-func (l *line) deleteChr(p int) {
-	p = p - 1
-	l.text = append(l.text[:p], l.text[p+1:]...)
 }
 
 func (b *buffer) moveCursor(d int) {
@@ -154,16 +124,4 @@ func (b *buffer) redo() {
 		b.lines = append(b.lines, tl)
 		b.lines[i].text = l.text
 	}
-}
-
-func (l *line) split(pos int) ([]rune, []rune) {
-	return l.text[:pos], l.text[pos:]
-}
-
-func (b *buffer) linenum() int {
-	return len(b.lines)
-}
-
-func (l *line) runenum() int {
-	return len(l.text)
 }
