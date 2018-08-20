@@ -24,13 +24,13 @@ func (b *buffer) backSpace() {
 	} else {
 		if b.cursor.x == 0 {
 			// store current line
-			t := b.lines[b.cursor.y].text
+			t := b.getTextOnCursorLine()
 			// delete current line
 			b.lines = append(b.lines[:b.cursor.y], b.lines[b.cursor.y+1:]...)
 			b.cursor.y--
 			// // join stored lines to previous line-end
-			plen := b.lines[b.cursor.y].text
-			b.lines[b.cursor.y].text = append(b.lines[b.cursor.y].text, t...)
+			plen := b.getTextOnCursorLine()
+			b.lines[b.cursor.y].text = append(b.getTextOnCursorLine(), t...)
 			b.cursor.x = len(plen)
 		} else {
 			b.lines[b.cursor.y].deleteChr(b.cursor.x)

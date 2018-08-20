@@ -60,6 +60,10 @@ func (l *line) split(pos int) ([]rune, []rune) {
 	return l.text[:pos], l.text[pos:]
 }
 
+func (b *buffer) getTextOnCursorLine() []rune {
+	return b.lines[b.cursor.y].text
+}
+
 func (b *buffer) numOfLines() int {
 	return len(b.lines)
 }
