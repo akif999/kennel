@@ -1,5 +1,23 @@
 package main
 
+type bufStack struct {
+	bufs []*buffer
+}
+
+type buffer struct {
+	cursor cursor
+	lines  []*line
+}
+
+type cursor struct {
+	x int
+	y int
+}
+
+type line struct {
+	text []rune
+}
+
 func (b *buffer) lineFeed() {
 	p := b.cursor.y + 1
 	// split line by the cursor and store these

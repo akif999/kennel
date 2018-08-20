@@ -20,29 +20,6 @@ var (
 	redoBuf = &bufStack{}
 )
 
-type bufStack struct {
-	bufs []*buffer
-}
-
-type buffer struct {
-	cursor cursor
-	lines  []*line
-}
-
-type cursor struct {
-	x int
-	y int
-}
-
-type file struct {
-	path     string
-	filetype byte
-}
-
-type line struct {
-	text []rune
-}
-
 func main() {
 	filename := ""
 	fmt.Print(len(os.Args))

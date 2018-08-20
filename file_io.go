@@ -7,6 +7,11 @@ import (
 	"os"
 )
 
+type file struct {
+	path     string
+	filetype byte
+}
+
 func (b *buffer) readFileToBuf(reader io.Reader) error {
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
