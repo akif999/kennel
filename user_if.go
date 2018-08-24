@@ -24,13 +24,13 @@ func (b *buffer) backSpace() {
 	} else {
 		if b.cursor.x == 0 {
 			// store current line
-			t := b.lines[b.cursor.y].text
+			t := b.getTextOnCursorLine()
 			// delete current line
 			b.lines = append(b.lines[:b.cursor.y], b.lines[b.cursor.y+1:]...)
 			b.cursor.y--
 			// // join stored lines to previous line-end
-			plen := b.lines[b.cursor.y].text
-			b.lines[b.cursor.y].text = append(b.lines[b.cursor.y].text, t...)
+			plen := b.getTextOnCursorLine()
+			b.lines[b.cursor.y].text = append(b.getTextOnCursorLine(), t...)
 			b.cursor.x = len(plen)
 		} else {
 			b.lines[b.cursor.y].deleteChr(b.cursor.x)
@@ -44,18 +44,6 @@ func (b *buffer) insertChr(r rune) {
 	b.cursor.x++
 }
 
-func (l *line) insertChr(r rune, p int) {
-	t := make([]rune, len(l.text), cap(l.text)+1)
-	copy(t, l.text)
-	l.text = append(t[:p+1], t[p:]...)
-	l.text[p] = r
-}
-
-func (l *line) deleteChr(p int) {
-	p = p - 1
-	l.text = append(l.text[:p], l.text[p+1:]...)
-}
-
 func (b *buffer) moveCursor(d int) {
 	switch d {
 	case Up:
@@ -63,18 +51,18 @@ func (b *buffer) moveCursor(d int) {
 		if b.cursor.y > 0 {
 			b.cursor.y--
 			// guard of end of "row"
-			if b.cursor.x > len(b.lines[b.cursor.y].text) {
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+			if b.cursor.x > b.numOfColsOnCursor() {
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
 	case Down:
 		// guard of end of "rows"
-		if b.cursor.y < b.linenum()-1 {
+		if b.cursor.y < b.numOfLines()-1 {
 			b.cursor.y++
 			// guard of end of "row"
-			if b.cursor.x > len(b.lines[b.cursor.y].text) {
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+			if b.cursor.x > b.numOfColsOnCursor() {
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
@@ -85,7 +73,7 @@ func (b *buffer) moveCursor(d int) {
 			// guard of top of "rows"
 			if b.cursor.y > 0 {
 				b.cursor.y--
-				b.cursor.x = len(b.lines[b.cursor.y].text)
+				b.cursor.x = b.numOfColsOnCursor()
 			}
 		}
 		break
@@ -94,7 +82,7 @@ func (b *buffer) moveCursor(d int) {
 			b.cursor.x++
 		} else {
 			// guard of end of "rows"
-			if b.cursor.y < b.linenum()-1 {
+			if b.cursor.y < b.numOfLines()-1 {
 				b.cursor.x = 0
 				b.cursor.y++
 			}
@@ -136,16 +124,4 @@ func (b *buffer) redo() {
 		b.lines = append(b.lines, tl)
 		b.lines[i].text = l.text
 	}
-}
-
-func (l *line) split(pos int) ([]rune, []rune) {
-	return l.text[:pos], l.text[pos:]
-}
-
-func (b *buffer) linenum() int {
-	return len(b.lines)
-}
-
-func (l *line) runenum() int {
-	return len(l.text)
 }
