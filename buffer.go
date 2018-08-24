@@ -1,6 +1,11 @@
 package main
 
-import termbox "github.com/nsf/termbox-go"
+const (
+	Up cursorDir = iota
+	Down
+	Left
+	Right
+)
 
 type bufStack struct {
 	bufs []*buffer
@@ -16,21 +21,10 @@ type cursor struct {
 	y int
 }
 
+type cursorDir uint8
+
 type line struct {
 	text []rune
-}
-
-func (b *buffer) updateLines() {
-	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
-	for y, l := range b.lines {
-		for x, r := range l.text {
-			termbox.SetCell(x, y, r, termbox.ColorWhite, termbox.ColorBlack)
-		}
-	}
-}
-
-func (b *buffer) updateCursor() {
-	termbox.SetCursor(b.cursor.x, b.cursor.y)
 }
 
 func (b *buffer) pushBufToUndoRedoBuffer() {

@@ -44,7 +44,7 @@ func (b *buffer) insertChr(r rune) {
 	b.cursor.x++
 }
 
-func (b *buffer) moveCursor(d int) {
+func (b *buffer) moveCursor(d cursorDir) {
 	switch d {
 	case Up:
 		// guard of top of "rows"
