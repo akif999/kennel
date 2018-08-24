@@ -47,47 +47,13 @@ func (b *buffer) insertChr(r rune) {
 func (b *buffer) moveCursor(d cursorDir) {
 	switch d {
 	case Up:
-		// guard of top of "rows"
-		if b.cursor.y > 0 {
-			b.cursor.y--
-			// guard of end of "row"
-			if b.cursor.x > b.numOfColsOnCursor() {
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorUp()
 	case Down:
-		// guard of end of "rows"
-		if b.cursor.y < b.numOfLines()-1 {
-			b.cursor.y++
-			// guard of end of "row"
-			if b.cursor.x > b.numOfColsOnCursor() {
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorDown()
 	case Left:
-		if b.cursor.x > 0 {
-			b.cursor.x--
-		} else {
-			// guard of top of "rows"
-			if b.cursor.y > 0 {
-				b.cursor.y--
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorLeft()
 	case Right:
-		if b.cursor.x < b.lines[b.cursor.y].runenum() {
-			b.cursor.x++
-		} else {
-			// guard of end of "rows"
-			if b.cursor.y < b.numOfLines()-1 {
-				b.cursor.x = 0
-				b.cursor.y++
-			}
-		}
-		break
+		b.cursorRight()
 	default:
 	}
 }

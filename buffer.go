@@ -69,3 +69,47 @@ func (b *buffer) pushBufToUndoRedoBuffer() {
 	}
 	undoBuf.bufs = append(undoBuf.bufs, tb)
 }
+
+func (b *buffer) cursorUp() {
+	// guard of top of "rows"
+	if b.cursor.y > 0 {
+		b.cursor.y--
+		// guard of end of "row"
+		if b.cursor.x > b.numOfColsOnCursor() {
+			b.cursor.x = b.numOfColsOnCursor()
+		}
+	}
+}
+
+func (b *buffer) cursorDown() {
+	// guard of end of "rows"
+	if b.cursor.y < b.numOfLines()-1 {
+		b.cursor.y++
+		// guard of end of "row"
+		if b.cursor.x > b.numOfColsOnCursor() {
+			b.cursor.x = b.numOfColsOnCursor()
+		}
+	}
+}
+func (b *buffer) cursorLeft() {
+	if b.cursor.x > 0 {
+		b.cursor.x--
+	} else {
+		// guard of top of "rows"
+		if b.cursor.y > 0 {
+			b.cursor.y--
+			b.cursor.x = b.numOfColsOnCursor()
+		}
+	}
+}
+func (b *buffer) cursorRight() {
+	if b.cursor.x < b.lines[b.cursor.y].runenum() {
+		b.cursor.x++
+	} else {
+		// guard of end of "rows"
+		if b.cursor.y < b.numOfLines()-1 {
+			b.cursor.x = 0
+			b.cursor.y++
+		}
+	}
+}
