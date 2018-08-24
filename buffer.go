@@ -27,18 +27,6 @@ type line struct {
 	text []rune
 }
 
-func (b *buffer) pushBufToUndoRedoBuffer() {
-	tb := new(buffer)
-	tb.cursor.x = b.cursor.x
-	tb.cursor.y = b.cursor.y
-	for i, l := range b.lines {
-		tl := new(line)
-		tb.lines = append(tb.lines, tl)
-		tb.lines[i].text = l.text
-	}
-	undoBuf.bufs = append(undoBuf.bufs, tb)
-}
-
 func (l *line) insertChr(r rune, p int) {
 	t := make([]rune, len(l.text), cap(l.text)+1)
 	copy(t, l.text)
@@ -68,4 +56,16 @@ func (b *buffer) numOfColsOnCursor() int {
 
 func (l *line) runenum() int {
 	return len(l.text)
+}
+
+func (b *buffer) pushBufToUndoRedoBuffer() {
+	tb := new(buffer)
+	tb.cursor.x = b.cursor.x
+	tb.cursor.y = b.cursor.y
+	for i, l := range b.lines {
+		tl := new(line)
+		tb.lines = append(tb.lines, tl)
+		tb.lines[i].text = l.text
+	}
+	undoBuf.bufs = append(undoBuf.bufs, tb)
 }
