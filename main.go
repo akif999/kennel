@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -22,7 +21,6 @@ var (
 
 func main() {
 	filename := ""
-	fmt.Print(len(os.Args))
 	if len(os.Args) > 1 {
 		filename = os.Args[1]
 	}
