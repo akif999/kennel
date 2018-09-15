@@ -25,11 +25,11 @@ func (b *buffer) readFileToBuf(reader io.Reader) error {
 	return nil
 }
 
-func (b *buffer) writeBufToFile() {
+func (b *buffer) writeBufToFile(path string) {
 	content := []byte{}
 	for _, l := range b.lines {
 		l.text = append(l.text, '\n')
 		content = append(content, string(l.text)...)
 	}
-	ioutil.WriteFile("./output.txt", content, os.ModePerm)
+	ioutil.WriteFile(path, content, os.ModePerm)
 }

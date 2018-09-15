@@ -63,7 +63,7 @@ mainloop:
 			case termbox.KeyCtrlY:
 				buf.redo()
 			case termbox.KeyCtrlS:
-				buf.writeBufToFile()
+				buf.saveAs()
 			case termbox.KeyEsc:
 				break mainloop
 			default:

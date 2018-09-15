@@ -91,3 +91,7 @@ func (b *buffer) redo() {
 		b.lines[i].text = l.text
 	}
 }
+
+func (b *buffer) saveAs() {
+	b.writeBufToFile("./output.txt")
+}
