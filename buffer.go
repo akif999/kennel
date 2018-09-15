@@ -38,8 +38,12 @@ func (l *line) deleteChr(p int) {
 	l.text = append(l.text[:p], l.text[p+1:]...)
 }
 
-func (l *line) split(pos int) ([]rune, []rune) {
+func splitLine(l *line, pos int) ([]rune, []rune) {
 	return l.text[:pos], l.text[pos:]
+}
+
+func joinLine(l *line, con []rune) {
+	l.text = append(l.text, con...)
 }
 
 func (b *buffer) getTextOnCursorLine() []rune {

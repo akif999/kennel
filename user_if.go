@@ -3,7 +3,7 @@ package main
 func (b *buffer) lineFeed() {
 	p := b.cursor.y + 1
 	// split line by the cursor and store these
-	fh, lh := b.lines[b.cursor.y].split(b.cursor.x)
+	fh, lh := splitLine(b.lines[b.cursor.y], b.cursor.x)
 
 	t := make([]*line, len(b.lines), cap(b.lines)+1)
 	copy(t, b.lines)
@@ -24,14 +24,14 @@ func (b *buffer) backSpace() {
 	} else {
 		if b.cursor.x == 0 {
 			// store current line
-			t := b.getTextOnCursorLine()
+			current := b.getTextOnCursorLine()
 			// delete current line
 			b.lines = append(b.lines[:b.cursor.y], b.lines[b.cursor.y+1:]...)
 			b.cursor.y--
 			// // join stored lines to previous line-end
-			plen := b.getTextOnCursorLine()
-			b.lines[b.cursor.y].text = append(b.getTextOnCursorLine(), t...)
-			b.cursor.x = len(plen)
+			prev := b.getTextOnCursorLine()
+			joinLine(b.lines[b.cursor.y], current)
+			b.cursor.x = len(prev)
 		} else {
 			b.lines[b.cursor.y].deleteChr(b.cursor.x)
 			b.cursor.x--
