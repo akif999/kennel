@@ -29,23 +29,23 @@ func TestMakeLineNum(t *testing.T) {
 }
 
 func TestGetDigits(t *testing.T) {
-	got := getDigits(1)
+	got := getDigit(1)
 	if got != 1 {
 		t.Errorf("failed")
 	}
-	got = getDigits(12)
+	got = getDigit(12)
 	if got != 2 {
 		t.Errorf("failed")
 	}
-	got = getDigits(123)
+	got = getDigit(123)
 	if got != 3 {
 		t.Errorf("failed")
 	}
-	got = getDigits(1234)
+	got = getDigit(1234)
 	if got != 4 {
 		t.Errorf("failed")
 	}
-	got = getDigits(12345)
+	got = getDigit(12345)
 	if got != 5 {
 		t.Errorf("failed")
 	}
