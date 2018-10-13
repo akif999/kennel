@@ -24,6 +24,7 @@ func main() {
 	defer termbox.Close()
 
 	buf := new(buffer)
+	// win := new(window)
 	if filename == "" {
 		buf.lines = []*line{&line{[]rune{}}}
 	} else {
@@ -33,6 +34,8 @@ func main() {
 		}
 		buf.readFileToBuf(file)
 	}
+	// win.updateWindowSize()
+	// win.copyBufToWindow(buf, true)
 	buf.updateWindowLines()
 	buf.updateWindowCursor()
 	buf.pushBufToUndoRedoBuffer()

@@ -17,8 +17,9 @@ type buffer struct {
 }
 
 type cursor struct {
-	x int
-	y int
+	x      int
+	y      int
+	offset int
 }
 
 type cursorDir uint8
