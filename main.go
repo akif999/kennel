@@ -7,13 +7,6 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-const (
-	Up = iota
-	Down
-	Left
-	Right
-)
-
 var (
 	undoBuf = &bufStack{}
 	redoBuf = &bufStack{}
@@ -31,6 +24,7 @@ func main() {
 	defer termbox.Close()
 
 	buf := new(buffer)
+	// win := new(window)
 	if filename == "" {
 		buf.lines = []*line{&line{[]rune{}}}
 	} else {
@@ -40,8 +34,10 @@ func main() {
 		}
 		buf.readFileToBuf(file)
 	}
-	buf.updateLines()
-	buf.updateCursor()
+	// win.updateWindowSize()
+	// win.copyBufToWindow(buf, true)
+	buf.updateWindowLines()
+	buf.updateWindowCursor()
 	buf.pushBufToUndoRedoBuffer()
 	termbox.Flush()
 
@@ -70,7 +66,7 @@ mainloop:
 			case termbox.KeyCtrlY:
 				buf.redo()
 			case termbox.KeyCtrlS:
-				buf.writeBufToFile()
+				buf.saveAs()
 			case termbox.KeyEsc:
 				break mainloop
 			default:
@@ -82,8 +78,8 @@ mainloop:
 				}
 			}
 		}
-		buf.updateLines()
-		buf.updateCursor()
+		buf.updateWindowLines()
+		buf.updateWindowCursor()
 		buf.pushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}

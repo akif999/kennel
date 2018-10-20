@@ -3,7 +3,7 @@ package main
 func (b *buffer) lineFeed() {
 	p := b.cursor.y + 1
 	// split line by the cursor and store these
-	fh, lh := b.lines[b.cursor.y].split(b.cursor.x)
+	fh, lh := splitLine(b.lines[b.cursor.y], b.cursor.x)
 
 	t := make([]*line, len(b.lines), cap(b.lines)+1)
 	copy(t, b.lines)
@@ -24,14 +24,14 @@ func (b *buffer) backSpace() {
 	} else {
 		if b.cursor.x == 0 {
 			// store current line
-			t := b.getTextOnCursorLine()
+			current := b.getTextOnCursorLine()
 			// delete current line
 			b.lines = append(b.lines[:b.cursor.y], b.lines[b.cursor.y+1:]...)
 			b.cursor.y--
 			// // join stored lines to previous line-end
-			plen := b.getTextOnCursorLine()
-			b.lines[b.cursor.y].text = append(b.getTextOnCursorLine(), t...)
-			b.cursor.x = len(plen)
+			prev := b.getTextOnCursorLine()
+			joinLine(b.lines[b.cursor.y], current)
+			b.cursor.x = len(prev)
 		} else {
 			b.lines[b.cursor.y].deleteChr(b.cursor.x)
 			b.cursor.x--
@@ -44,50 +44,16 @@ func (b *buffer) insertChr(r rune) {
 	b.cursor.x++
 }
 
-func (b *buffer) moveCursor(d int) {
+func (b *buffer) moveCursor(d cursorDir) {
 	switch d {
 	case Up:
-		// guard of top of "rows"
-		if b.cursor.y > 0 {
-			b.cursor.y--
-			// guard of end of "row"
-			if b.cursor.x > b.numOfColsOnCursor() {
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorUp()
 	case Down:
-		// guard of end of "rows"
-		if b.cursor.y < b.numOfLines()-1 {
-			b.cursor.y++
-			// guard of end of "row"
-			if b.cursor.x > b.numOfColsOnCursor() {
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorDown()
 	case Left:
-		if b.cursor.x > 0 {
-			b.cursor.x--
-		} else {
-			// guard of top of "rows"
-			if b.cursor.y > 0 {
-				b.cursor.y--
-				b.cursor.x = b.numOfColsOnCursor()
-			}
-		}
-		break
+		b.cursorLeft()
 	case Right:
-		if b.cursor.x < b.lines[b.cursor.y].runenum() {
-			b.cursor.x++
-		} else {
-			// guard of end of "rows"
-			if b.cursor.y < b.numOfLines()-1 {
-				b.cursor.x = 0
-				b.cursor.y++
-			}
-		}
-		break
+		b.cursorRight()
 	default:
 	}
 }
@@ -124,4 +90,8 @@ func (b *buffer) redo() {
 		b.lines = append(b.lines, tl)
 		b.lines[i].text = l.text
 	}
+}
+
+func (b *buffer) saveAs() {
+	b.writeBufToFile("./output.txt")
 }
