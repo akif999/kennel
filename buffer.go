@@ -1,5 +1,7 @@
 package main
 
+import "os"
+
 const (
 	Up cursorDir = iota
 	Down
@@ -26,6 +28,25 @@ type cursorDir uint8
 
 type line struct {
 	text []rune
+}
+
+func createBuffer(filename string) (*buffer, error) {
+	b := new(buffer)
+
+	if filename == "" {
+		b.lines = []*line{&line{[]rune{}}}
+	} else {
+		file, err := os.Open(filename)
+		if err != nil {
+			return nil, err
+		}
+		b.readFileToBuf(file)
+	}
+	b.updateWindowLines()
+	b.updateWindowCursor()
+	b.pushBufToUndoRedoBuffer()
+
+	return b, nil
 }
 
 func (l *line) insertChr(r rune, p int) {

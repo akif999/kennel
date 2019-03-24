@@ -17,28 +17,16 @@ func main() {
 	if len(os.Args) > 1 {
 		filename = os.Args[1]
 	}
-	err := startUp()
+
+	buf, err := createBuffer(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err := initTermbox()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer termbox.Close()
-
-	buf := new(buffer)
-	// win := new(window)
-	if filename == "" {
-		buf.lines = []*line{&line{[]rune{}}}
-	} else {
-		file, err := os.Open(filename)
-		if err != nil {
-			log.Fatal(err)
-		}
-		buf.readFileToBuf(file)
-	}
-	// win.updateWindowSize()
-	// win.copyBufToWindow(buf, true)
-	buf.updateWindowLines()
-	buf.updateWindowCursor()
-	buf.pushBufToUndoRedoBuffer()
 	termbox.Flush()
 
 mainloop:
@@ -85,7 +73,7 @@ mainloop:
 	}
 }
 
-func startUp() error {
+func initTermbox() error {
 	err := termbox.Init()
 	if err != nil {
 		return err
