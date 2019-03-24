@@ -18,15 +18,20 @@ func main() {
 		filename = os.Args[1]
 	}
 
-	buf, err := createBuffer(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
 	err := initTermbox()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer termbox.Close()
+	buf, err := createBuffer(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	win, err := createWindow(buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	termbox.Flush()
 
 mainloop:
@@ -66,8 +71,9 @@ mainloop:
 				}
 			}
 		}
-		buf.updateWindowLines()
-		buf.updateWindowCursor()
+		win.copyBufToWindow(buf, true)
+		win.updateWindowLines(buf)
+		win.updateWindowCursor()
 		buf.pushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}

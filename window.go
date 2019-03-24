@@ -17,11 +17,19 @@ type size struct {
 	y int
 }
 
-func (b *buffer) updateWindowLines() {
+func createWindow(b *buffer) (*window, error) {
+	w := new(window)
+	w.copyBufToWindow(b, true)
+	w.updateWindowLines(b)
+	w.updateWindowCursor()
+	return w, nil
+}
+
+func (w *window) updateWindowLines(b *buffer) {
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	offset := getDigit(b.numOfLines())
-	b.cursor.offset = offset + 1
-	for y, l := range b.lines {
+	w.cursor.offset = offset + 1
+	for y, l := range w.lines {
 		linenums := makeLineNum(y+1, offset)
 		t := append(linenums, l.text...)
 		for x, r := range t {
@@ -30,21 +38,21 @@ func (b *buffer) updateWindowLines() {
 	}
 }
 
-func (b *buffer) updateWindowCursor() {
-	termbox.SetCursor(b.cursor.x+b.cursor.offset, b.cursor.y)
+func (w *window) updateWindowCursor() {
+	termbox.SetCursor(w.cursor.x+w.cursor.offset, w.cursor.y)
 }
 
 func (w *window) updateWindowSize() {
 }
 
 func (w *window) copyBufToWindow(b *buffer, addLinenum bool) {
-	// offset := getDigit(b.numOfLines()) + 1
-	/*
-		for i, l := range b.lines {
-			linenum := makeLineNum(i+1, offset)
-			w.lines[i].text = append(w.lines[i].text)
-		}
-	*/
+	w.lines = []*line{}
+	for _, l := range b.lines {
+		w.lines = append(w.lines, l)
+	}
+	w.cursor.x = b.cursor.x
+	w.cursor.y = b.cursor.y
+	w.cursor.offset = b.cursor.offset
 }
 
 func makeLineNum(num int, digit int) []rune {

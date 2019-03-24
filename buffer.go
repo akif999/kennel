@@ -42,8 +42,6 @@ func createBuffer(filename string) (*buffer, error) {
 		}
 		b.readFileToBuf(file)
 	}
-	b.updateWindowLines()
-	b.updateWindowCursor()
 	b.pushBufToUndoRedoBuffer()
 
 	return b, nil
