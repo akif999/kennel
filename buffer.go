@@ -1,6 +1,10 @@
 package main
 
-import "os"
+import (
+	"os"
+
+	termbox "github.com/nsf/termbox-go"
+)
 
 const (
 	Up cursorDir = iota
@@ -14,8 +18,10 @@ type bufStack struct {
 }
 
 type buffer struct {
-	cursor cursor
-	lines  []*line
+	cursor          cursor
+	lines           []*line
+	showStartHeight int
+	showStartWidth  int
 }
 
 type cursor struct {
@@ -102,6 +108,9 @@ func (b *buffer) cursorUp() {
 		if b.cursor.x > b.numOfColsOnCursor() {
 			b.cursor.x = b.numOfColsOnCursor()
 		}
+		if b.isCursorOutOfWindowTop() {
+			b.showStartHeight--
+		}
 	}
 }
 
@@ -113,27 +122,61 @@ func (b *buffer) cursorDown() {
 		if b.cursor.x > b.numOfColsOnCursor() {
 			b.cursor.x = b.numOfColsOnCursor()
 		}
+		if b.isCursorOutOfWindowBottom() {
+			b.showStartHeight++
+		}
 	}
 }
 func (b *buffer) cursorLeft() {
+	winWidth, _ := termbox.Size()
 	if b.cursor.x > 0 {
 		b.cursor.x--
+		if b.isCursorOutOfWindowLeft() {
+			b.showStartWidth--
+		}
 	} else {
 		// guard of top of "rows"
 		if b.cursor.y > 0 {
 			b.cursor.y--
 			b.cursor.x = b.numOfColsOnCursor()
+			b.showStartHeight--
+			b.showStartWidth = winWidth - getDigit(b.numOfLines()) + 1 + b.numOfColsOnCursor()
 		}
 	}
 }
+
 func (b *buffer) cursorRight() {
 	if b.cursor.x < b.lines[b.cursor.y].runenum() {
 		b.cursor.x++
+		if b.isCursorOutOfWindowRight() {
+			b.showStartWidth++
+		}
 	} else {
 		// guard of end of "rows"
 		if b.cursor.y < b.numOfLines()-1 {
 			b.cursor.x = 0
 			b.cursor.y++
+			b.showStartHeight++
+			b.showStartWidth = 0
 		}
 	}
+}
+
+func (b *buffer) isCursorOutOfWindowTop() bool {
+	return b.cursor.y < b.showStartHeight
+}
+
+func (b *buffer) isCursorOutOfWindowBottom() bool {
+	_, winHeight := termbox.Size()
+	return b.cursor.y+1 > b.showStartHeight+winHeight
+}
+
+func (b *buffer) isCursorOutOfWindowLeft() bool {
+	return b.cursor.x < b.showStartWidth
+}
+
+func (b *buffer) isCursorOutOfWindowRight() bool {
+	winWidth, _ := termbox.Size()
+	offset := getDigit(b.numOfLines()) + 1
+	return b.cursor.x+1+offset > b.showStartWidth+winWidth
 }

@@ -19,10 +19,10 @@ func main() {
 	}
 
 	err := initTermbox()
+	defer termbox.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer termbox.Close()
 	buf, err := createBuffer(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -73,7 +73,7 @@ mainloop:
 		}
 		win.copyBufToWindow(buf, true)
 		win.updateWindowLines(buf)
-		win.updateWindowCursor()
+		win.updateWindowCursor(buf)
 		buf.pushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}
