@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/akif999/kennel/buffer"
+	"github.com/akif999/kennel/user"
 	"github.com/akif999/kennel/window"
 	termbox "github.com/nsf/termbox-go"
 )
@@ -47,34 +48,34 @@ mainloop:
 		case termbox.EventKey:
 			switch ev.Key {
 			case termbox.KeyEnter:
-				lineFeed(buf)
+				user.LineFeed(buf)
 			// mac delete-key is this
 			case termbox.KeyCtrlH:
 				fallthrough
 			case termbox.KeyBackspace2:
-				backSpace(buf)
+				user.BackSpace(buf)
 			case termbox.KeyArrowUp:
-				moveCursor(buf, buffer.Up)
+				user.MoveCursor(buf, buffer.Up)
 			case termbox.KeyArrowDown:
-				moveCursor(buf, buffer.Down)
+				user.MoveCursor(buf, buffer.Down)
 			case termbox.KeyArrowLeft:
-				moveCursor(buf, buffer.Left)
+				user.MoveCursor(buf, buffer.Left)
 			case termbox.KeyArrowRight:
-				moveCursor(buf, buffer.Right)
+				user.MoveCursor(buf, buffer.Right)
 			case termbox.KeyCtrlZ:
-				undo(buf)
+				user.Undo(buf)
 			case termbox.KeyCtrlY:
-				redo(buf)
+				user.Redo(buf)
 			case termbox.KeyCtrlS:
-				saveAs(buf)
+				user.SaveAs(buf)
 			case termbox.KeyEsc:
 				break mainloop
 			default:
 				// convert null charactor by space to space
 				if ev.Ch == '\u0000' {
-					insertChr(buf, ' ')
+					user.InsertChr(buf, ' ')
 				} else {
-					insertChr(buf, ev.Ch)
+					user.InsertChr(buf, ev.Ch)
 				}
 			}
 		}
