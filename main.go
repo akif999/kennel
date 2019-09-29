@@ -4,12 +4,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/akif999/kennel/buffer"
+	"github.com/akif999/kennel/user"
+	"github.com/akif999/kennel/window"
 	termbox "github.com/nsf/termbox-go"
-)
-
-var (
-	undoBuf = &bufStack{}
-	redoBuf = &bufStack{}
 )
 
 func main() {
@@ -23,11 +21,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	buf, err := createBuffer(filename)
+	buf, err := buffer.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-	win, err := createWindow(buf)
+	if filename == "" {
+		buf.Lines = []*buffer.Line{&buffer.Line{[]rune{}}}
+	} else {
+		file, err := os.Open(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		buf.ReadFileToBuf(file)
+	}
+	buf.PushBufToUndoRedoBuffer()
+	win, err := window.New(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,41 +48,41 @@ mainloop:
 		case termbox.EventKey:
 			switch ev.Key {
 			case termbox.KeyEnter:
-				buf.lineFeed()
+				user.LineFeed(buf)
 			// mac delete-key is this
 			case termbox.KeyCtrlH:
 				fallthrough
 			case termbox.KeyBackspace2:
-				buf.backSpace()
+				user.BackSpace(buf)
 			case termbox.KeyArrowUp:
-				buf.moveCursor(Up)
+				user.MoveCursor(buf, buffer.Up)
 			case termbox.KeyArrowDown:
-				buf.moveCursor(Down)
+				user.MoveCursor(buf, buffer.Down)
 			case termbox.KeyArrowLeft:
-				buf.moveCursor(Left)
+				user.MoveCursor(buf, buffer.Left)
 			case termbox.KeyArrowRight:
-				buf.moveCursor(Right)
+				user.MoveCursor(buf, buffer.Right)
 			case termbox.KeyCtrlZ:
-				buf.undo()
+				user.Undo(buf)
 			case termbox.KeyCtrlY:
-				buf.redo()
+				user.Redo(buf)
 			case termbox.KeyCtrlS:
-				buf.saveAs()
+				user.SaveAs(buf)
 			case termbox.KeyEsc:
 				break mainloop
 			default:
 				// convert null charactor by space to space
 				if ev.Ch == '\u0000' {
-					buf.insertChr(' ')
+					user.InsertChr(buf, ' ')
 				} else {
-					buf.insertChr(ev.Ch)
+					user.InsertChr(buf, ev.Ch)
 				}
 			}
 		}
-		win.copyBufToWindow(buf, true)
-		win.updateWindowLines(buf)
-		win.updateWindowCursor(buf)
-		buf.pushBufToUndoRedoBuffer()
+		win.CopyBufToWindow(buf, true)
+		win.UpdateWindowLines(buf)
+		win.UpdateWindowCursor(buf)
+		buf.PushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}
 }
