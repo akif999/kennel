@@ -56,7 +56,7 @@ Kennel has the following functions.
 
 ## Build & Installation
 
-`$ go build main.go`
+`$ go build`
 
 ## License
 
