@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/akif999/kennel/buffer"
+	"github.com/akif999/kennel/window"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -33,7 +34,7 @@ func main() {
 		buf.ReadFileToBuf(file)
 	}
 	buf.PushBufToUndoRedoBuffer()
-	win, err := createWindow(buf)
+	win, err := window.New(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,9 +78,9 @@ mainloop:
 				}
 			}
 		}
-		win.copyBufToWindow(buf, true)
-		win.updateWindowLines(buf)
-		win.updateWindowCursor(buf)
+		win.CopyBufToWindow(buf, true)
+		win.UpdateWindowLines(buf)
+		win.UpdateWindowCursor(buf)
 		buf.PushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}

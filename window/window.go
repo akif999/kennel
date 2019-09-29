@@ -1,4 +1,4 @@
-package main
+package window
 
 import (
 	"strconv"
@@ -12,15 +12,15 @@ type window struct {
 	lines  []*buffer.Line
 }
 
-func createWindow(b *buffer.Buffer) (*window, error) {
+func New(b *buffer.Buffer) (*window, error) {
 	w := new(window)
-	w.copyBufToWindow(b, true)
-	w.updateWindowLines(b)
-	w.updateWindowCursor(b)
+	w.CopyBufToWindow(b, true)
+	w.UpdateWindowLines(b)
+	w.UpdateWindowCursor(b)
 	return w, nil
 }
 
-func (w *window) updateWindowLines(b *buffer.Buffer) {
+func (w *window) UpdateWindowLines(b *buffer.Buffer) {
 	termbox.Clear(termbox.ColorWhite, termbox.ColorBlack)
 	offset := buffer.GetDigit(b.NumOfLines())
 	w.cursor.Offset = offset + 1
@@ -33,11 +33,11 @@ func (w *window) updateWindowLines(b *buffer.Buffer) {
 	}
 }
 
-func (w *window) updateWindowCursor(b *buffer.Buffer) {
+func (w *window) UpdateWindowCursor(b *buffer.Buffer) {
 	termbox.SetCursor(w.cursor.X+w.cursor.Offset-b.ShowStartWidth, w.cursor.Y-b.ShowStartHeight)
 }
 
-func (w *window) copyBufToWindow(b *buffer.Buffer, addLinenum bool) {
+func (w *window) CopyBufToWindow(b *buffer.Buffer, addLinenum bool) {
 	w.lines = []*buffer.Line{}
 	winWidth, winHeight := termbox.Size()
 	for i := 0; i+b.ShowStartHeight < len(b.Lines); i++ {

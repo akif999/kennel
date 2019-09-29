@@ -80,3 +80,26 @@ func TestDeleteChr(t *testing.T) {
 		}
 	}
 }
+
+func TestGetDigits(t *testing.T) {
+	got := GetDigit(1)
+	if got != 1 {
+		t.Errorf("failed")
+	}
+	got = GetDigit(12)
+	if got != 2 {
+		t.Errorf("failed")
+	}
+	got = GetDigit(123)
+	if got != 3 {
+		t.Errorf("failed")
+	}
+	got = GetDigit(1234)
+	if got != 4 {
+		t.Errorf("failed")
+	}
+	got = GetDigit(12345)
+	if got != 5 {
+		t.Errorf("failed")
+	}
+}
