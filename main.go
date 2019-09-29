@@ -4,12 +4,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/akif999/kennel/buffer"
 	termbox "github.com/nsf/termbox-go"
-)
-
-var (
-	undoBuf = &bufStack{}
-	redoBuf = &bufStack{}
 )
 
 func main() {
@@ -23,10 +19,20 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	buf, err := createBuffer(filename)
+	buf, err := buffer.New()
 	if err != nil {
 		log.Fatal(err)
 	}
+	if filename == "" {
+		buf.Lines = []*buffer.Line{&buffer.Line{[]rune{}}}
+	} else {
+		file, err := os.Open(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		buf.ReadFileToBuf(file)
+	}
+	buf.PushBufToUndoRedoBuffer()
 	win, err := createWindow(buf)
 	if err != nil {
 		log.Fatal(err)
@@ -40,41 +46,41 @@ mainloop:
 		case termbox.EventKey:
 			switch ev.Key {
 			case termbox.KeyEnter:
-				buf.lineFeed()
+				lineFeed(buf)
 			// mac delete-key is this
 			case termbox.KeyCtrlH:
 				fallthrough
 			case termbox.KeyBackspace2:
-				buf.backSpace()
+				backSpace(buf)
 			case termbox.KeyArrowUp:
-				buf.moveCursor(Up)
+				moveCursor(buf, buffer.Up)
 			case termbox.KeyArrowDown:
-				buf.moveCursor(Down)
+				moveCursor(buf, buffer.Down)
 			case termbox.KeyArrowLeft:
-				buf.moveCursor(Left)
+				moveCursor(buf, buffer.Left)
 			case termbox.KeyArrowRight:
-				buf.moveCursor(Right)
+				moveCursor(buf, buffer.Right)
 			case termbox.KeyCtrlZ:
-				buf.undo()
+				undo(buf)
 			case termbox.KeyCtrlY:
-				buf.redo()
+				redo(buf)
 			case termbox.KeyCtrlS:
-				buf.saveAs()
+				saveAs(buf)
 			case termbox.KeyEsc:
 				break mainloop
 			default:
 				// convert null charactor by space to space
 				if ev.Ch == '\u0000' {
-					buf.insertChr(' ')
+					insertChr(buf, ' ')
 				} else {
-					buf.insertChr(ev.Ch)
+					insertChr(buf, ev.Ch)
 				}
 			}
 		}
 		win.copyBufToWindow(buf, true)
 		win.updateWindowLines(buf)
 		win.updateWindowCursor(buf)
-		buf.pushBufToUndoRedoBuffer()
+		buf.PushBufToUndoRedoBuffer()
 		termbox.Flush()
 	}
 }

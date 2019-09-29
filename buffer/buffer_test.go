@@ -1,4 +1,4 @@
-package main
+package buffer
 
 import (
 	"reflect"
@@ -35,10 +35,10 @@ func TestInsertChr(t *testing.T) {
 	}
 
 	for _, te := range ts {
-		l := new(line)
-		l.text = te.text
+		l := new(Line)
+		l.Text = te.text
 		l.insertChr(te.r, te.p)
-		te.got = l.text
+		te.got = l.Text
 		if !reflect.DeepEqual(te.got, te.exp) {
 			t.Errorf("failed got : %v, exp : %v", te.got, te.exp)
 		}
@@ -71,10 +71,10 @@ func TestDeleteChr(t *testing.T) {
 	}
 
 	for _, te := range ts {
-		l := new(line)
-		l.text = te.text
+		l := new(Line)
+		l.Text = te.text
 		l.deleteChr(te.p)
-		te.got = l.text
+		te.got = l.Text
 		if !reflect.DeepEqual(te.got, te.exp) {
 			t.Errorf("failed got : %v, exp : %v", te.got, te.exp)
 		}
