@@ -1,3 +1,6 @@
+0.3.0
+- package components
+
 0.2.0
 - add scrolling(vertical/horizontal)
 - add window layer
